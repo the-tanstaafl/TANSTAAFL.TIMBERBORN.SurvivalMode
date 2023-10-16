@@ -56,33 +56,40 @@ namespace TANSTAAFL.TIMBERBORN.SurvivalMode
         {
             Plugin.Log.LogWarning("A beaver died! Beavers are not working for a day");
 
-            if (ConfigLoader._savedConfig.WorkingHours == 0)
+            var punisherConfig = ConfigLoader._savedConfig.Punisher;
+
+            if (punisherConfig.WorkingHours == 0)
             {
-                ConfigLoader._savedConfig.WorkingHours = _workingHoursManager.EndHours;
+                punisherConfig.WorkingHours = _workingHoursManager.EndHours;
             }
 
-            ConfigLoader._savedConfig.Day = _dayNightCycle.DayNumber;
-            ConfigLoader._savedConfig.Hour = _dayNightCycle.DayProgress;
-            ConfigLoader._savedConfig.PunishmentActive = true;
+            punisherConfig.Day = _dayNightCycle.DayNumber;
+            punisherConfig.Hour = _dayNightCycle.DayProgress;
+            punisherConfig.Active = true;
         }
 
         private void Unpunish()
         {
             Plugin.Log.LogWarning("Beavers are returning to work");
 
-            _workingHoursManager.EndHours = ConfigLoader._savedConfig.WorkingHours;
+            var punisherConfig = ConfigLoader._savedConfig.Punisher;
 
-            ConfigLoader._savedConfig.Day = 0;
-            ConfigLoader._savedConfig.Hour = 0;
-            ConfigLoader._savedConfig.PunishmentActive = false;
-            ConfigLoader._savedConfig.WorkingHours = 0;
+            _workingHoursManager.EndHours = punisherConfig.WorkingHours;
+
+            punisherConfig.Day = 0;
+            punisherConfig.Hour = 0;
+            punisherConfig.Active = false;
+            punisherConfig.WorkingHours = 0;
         }
 
         public void Tick()
         {
-            if (ConfigLoader._savedConfig?.PunishmentActive??false)
+            var punisherConfig = ConfigLoader._savedConfig.Punisher;
+
+            if (ConfigLoader._savedConfig?.Punisher.Active??false)
             {
-                if (ConfigLoader._savedConfig.Day == _dayNightCycle.DayNumber || ConfigLoader._savedConfig.Hour > _dayNightCycle.DayProgress)
+                if (punisherConfig.Day == _dayNightCycle.DayNumber 
+                    || punisherConfig.Hour > _dayNightCycle.DayProgress)
                 {
                     _workingHoursManager.EndHours = 0;
                 }

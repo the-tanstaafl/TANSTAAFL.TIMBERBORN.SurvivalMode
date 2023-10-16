@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using TANSTAAFL.TIMBERBORN.SurvivalMode.Configs;
 using Timberborn.Beavers;
 using Timberborn.BlockSystem;
 using Timberborn.Buildings;
+using Timberborn.Characters;
 using Timberborn.GameDistricts;
 using Timberborn.Navigation;
+using Timberborn.NeedSpecifications;
+using Timberborn.NeedSystem;
 using Timberborn.Reproduction;
 using Timberborn.SingletonSystem;
 using Timberborn.TimeSystem;
@@ -42,28 +46,41 @@ namespace TANSTAAFL.TIMBERBORN.SurvivalMode
         [OnEvent]
         public void OnDayStartedEvent(DayStartedEvent dayStartedEvent)
         {
+            var punisherConfig = ConfigLoader._savedConfig.Punisher;
+
+            if (punisherConfig.Active)
+            {
+                return;
+            }
+
             var cycle = _weatherService.Cycle;
             var day = _weatherService.CycleDay;
             var create = 0;
 
-            if (cycle < 4)
+            if (cycle < 5)
             {
                 switch (cycle)
                 {
                     case 1:
-                        create = day % 4 == 0 ? 1 : 0;
+                        create = day % 2 == 0 ? 1 : 0;
                         break;
                     case 2:
-                        create = day % 3 == 0 ? 1 : 0;
-                        break;
                     case 3:
-                        create = day % 2 == 0 ? 1 : 0;
+                        create = 1;
+                        break;
+                    case 4:
+                    case 5:
+                    case 6:
+                        create = 2;
+                        break;
+                    case 7:
+                        create = 3;
                         break;
                 }
             }
             else
             {
-                create = cycle - 3;
+                create = cycle - 5;
             }
 
             Plugin.Log.LogInfo($"cycle {cycle} day {day} add {create} beavers");
